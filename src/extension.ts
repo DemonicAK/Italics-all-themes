@@ -25,7 +25,6 @@
 // // This method is called when your extension is deactivated
 // export function deactivate() {}
 
-
 import * as vscode from "vscode";
 
 export function activate(context: vscode.ExtensionContext) {
@@ -45,6 +44,13 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  // Listen for theme changes
+  vscode.workspace.onDidChangeConfiguration((event) => {
+    if (event.affectsConfiguration("workbench.colorTheme")) {
+      updateItalicsSettings();
+    }
+  });
+
   context.subscriptions.push(disposable);
 }
 
@@ -57,132 +63,139 @@ function updateItalicsSettings() {
   // Check if the current theme has "(no italics)" in its name
   if (currentTheme.toLowerCase().includes("(no italics)")) {
     console.log("Current theme does not support italics. Skipping...");
+    config.update(
+      "editor.tokenColorCustomizations",
+      {
+        textMateRules: [],
+      },
+      vscode.ConfigurationTarget.Global
+    );
     return;
   }
 
   const italicsRules = [
     // Your provided rules here
- {
-        "scope": "emphasis",
-        "settings": {
-          "fontStyle": "italic"
-        }
+    {
+      scope: "emphasis",
+      settings: {
+        fontStyle: "italic",
       },
-      {
-        "scope": "strong",
-        "settings": {
-          "fontStyle": "bold"
-        }
+    },
+    {
+      scope: "strong",
+      settings: {
+        fontStyle: "bold",
       },
-      {
-        "scope": "entity.other.attribute-name",
-        "settings": {
-          "fontStyle": "italic"
-        }
+    },
+    {
+      scope: "entity.other.attribute-name",
+      settings: {
+        fontStyle: "italic",
       },
-      {
-        "scope": "markup.underline",
-        "settings": {
-          "fontStyle": "underline"
-        }
+    },
+    {
+      scope: "markup.underline",
+      settings: {
+        fontStyle: "underline",
       },
-      {
-        "scope": "markup.bold",
-        "settings": {
-          "fontStyle": "bold"
-        }
+    },
+    {
+      scope: "markup.bold",
+      settings: {
+        fontStyle: "bold",
       },
-      {
-        "scope": "markup.heading",
-        "settings": {
-          "fontStyle": "italic bold underline"
-        }
+    },
+    {
+      scope: "markup.heading",
+      settings: {
+        fontStyle: "italic bold underline",
       },
-      {
-        "scope": "markup.italic",
-        "settings": {
-          "fontStyle": "italic"
-        }
+    },
+    {
+      scope: "markup.italic",
+      settings: {
+        fontStyle: "italic",
       },
-      {
-        "scope": "storage.type",
-        "settings": {
-          "fontStyle": "italic"
-        }
+    },
+    {
+      scope: "storage.type",
+      settings: {
+        fontStyle: "italic",
       },
-      {
-        "scope": "storage.modifier",
-        "settings": {
-          "fontStyle": "italic"
-        }
+    },
+    {
+      scope: "storage.modifier",
+      settings: {
+        fontStyle: "italic",
       },
-      {
-        "name": "String interpolation",
-        "scope": [
-          "punctuation.definition.template-expression.begin",
-          "punctuation.definition.template-expression.end",
-          "punctuation.section.embedded"
-        ],
-        "settings": {
-          "fontStyle": "italic"
-        }
+    },
+    {
+      name: "String interpolation",
+      scope: [
+        "punctuation.definition.template-expression.begin",
+        "punctuation.definition.template-expression.end",
+        "punctuation.section.embedded",
+      ],
+      settings: {
+        fontStyle: "italic",
       },
-      {
-        "scope": "keyword.control",
-        "settings": {
-          "fontStyle": "italic"
-        }
+    },
+    {
+      scope: "keyword.control",
+      settings: {
+        fontStyle: "italic",
       },
-      {
-        "scope": [
-          "keyword.operator.new",
-          "keyword.operator.expression",
-          "keyword.operator.cast",
-          "keyword.operator.sizeof",
-          "keyword.operator.logical.python"
-        ],
-        "settings": {
-          "fontStyle": "italic"
-        }
+    },
+    {
+      scope: [
+        "keyword.operator.new",
+        "keyword.operator.expression",
+        "keyword.operator.cast",
+        "keyword.operator.sizeof",
+        "keyword.operator.logical.python",
+      ],
+      settings: {
+        fontStyle: "italic",
       },
-      {
-        "name": "this.self",
-        "scope": "variable.language",
-        "settings": {
-          "fontStyle": "italic",
-          "foreground": "#ff5874"
-        }
+    },
+    {
+      name: "this.self",
+      scope: "variable.language",
+      settings: {
+        fontStyle: "italic",
+        foreground: "#ff5874",
       },
-      {
-        "name": "@Decorator",
-        "scope": ["meta.decorator punctuation.decorator"],
-        "settings": {
-          "fontStyle": "italic"
-        }
+    },
+    {
+      name: "@Decorator",
+      scope: ["meta.decorator punctuation.decorator"],
+      settings: {
+        fontStyle: "italic",
       },
-      {
-        "scope": ["punctuation.definition.comment", "comment"],
-        "settings": {
-          // "foreground": "#ff5874",
-          "fontStyle": "italic"
-        }
+    },
+    {
+      scope: ["punctuation.definition.comment", "comment"],
+      settings: {
+        // "foreground": "#ff5874",
+        fontStyle: "italic",
       },
-      {
-        "scope": ["keywords", "variable", "variable.function", "comment"],
-        "settings": {
-          // "foreground": "#ff5874",
-          "fontStyle": "italic"
-        }
+    },
+    {
+      scope: ["keywords", "variable", "variable.function", "comment"],
+      settings: {
+        // "foreground": "#ff5874",
+        fontStyle: "italic",
       },
-      {
-        // "scope": [],
-        "scope": ["entity.name.function", "meta.function"],
-        "settings": {
-          // "foreground": "#ff5874",
-          "fontStyle": "italic"
-        }
-      }
-    
+    },
+    {
+      // "scope": [],
+      scope: ["entity.name.function", "meta.function"],
+      settings: {
+        // "foreground": "#ff5874",
+        fontStyle: "italic",
+      },
+    },
+
     // ... (include all the rules from your snippet)
   ];
 

@@ -2,6 +2,28 @@
 
 This extension enables italics support for all themes in Visual Studio Code, except for those themes that explicitly mention "(no italics)" in their name.
 
+## Prerequisites
+
+Before using this extension, ensure that:
+
+1. You have a font installed and set in VS Code that supports italics.
+2. Your VS Code settings are configured to use this font.
+
+Without a font that supports italics, you won't see the italic styling even if the extension is active.
+
+To set a font in VS Code:
+
+1. Open Settings (File > Preferences > Settings)
+2. Search for "Font Family"
+3. Add or ensure your chosen font (that supports italics) is listed in the "Font Family" field
+
+Popular coding fonts with italic support include:
+
+- Fira Code
+- JetBrains Mono
+- Source Code Pro
+- Cascadia Code
+
 ## Features
 
 - Automatically applies italics to various code elements across all supported themes
@@ -12,7 +34,7 @@ This extension enables italics support for all themes in Visual Studio Code, exc
 
 1. Open Visual Studio Code
 2. Go to the Extensions view (Ctrl+Shift+X)
-3. Search for Italics-all-themes"
+3. Search for "Italics-all-themes"
 4. Click Install
 
 ## Usage
@@ -25,6 +47,8 @@ If you need to manually apply the italics settings:
 
 1. Open the Command Palette (Ctrl+Shift+P)
 2. Search for and select "Enable Italics-all-themes"
+
+[... rest of the README remains the same ...]
 
 ## Supported Elements
 
