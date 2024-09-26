@@ -1,21 +1,42 @@
 {
   "name": "italics-all-themes",
-  "displayName": "italics-all-themes",
-  "description": "",
-  "version": "0.0.1",
+  "displayName": "Italics-all-themes",
+  "description": "Enables italics support for all themes except those explicitly marked '(no italics)'",
+  "version": "1.0.0",
+  "publisher": "Kar Industries",
+  "author": {
+    "name": "Arijit Kar"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DemonicAK/Italics-all-themes.git"
+  },
+  "bugs": {
+    "url": "https://github.com/DemonicAK/Italics-all-themes/issues"
+  },
+  "homepage": "https://github.com/DemonicAK/Italics-all-themes#readme",
   "engines": {
     "vscode": "^1.93.0"
   },
   "categories": [
+    "Themes",
     "Other"
   ],
-  "activationEvents": [],
+  "keywords": [
+    "italics",
+    "font style",
+    "theme",
+    "syntax highlighting"
+  ],
+  "activationEvents": [
+    "*"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "italics-all-themes.helloWorld",
-        "title": "Hello World"
+        "command": "extension.enableItalics",
+        "title": "Enable Italics-all-themes"
       }
     ]
   },

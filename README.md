@@ -1,4 +1,4 @@
-# Italics Support Extension for VS Code
+# Italics-all-themes Extension for VS Code
 
 This extension enables italics support for all themes in Visual Studio Code, except for those themes that explicitly mention "(no italics)" in their name.
 
@@ -12,7 +12,7 @@ This extension enables italics support for all themes in Visual Studio Code, exc
 
 1. Open Visual Studio Code
 2. Go to the Extensions view (Ctrl+Shift+X)
-3. Search for "Italics Support"
+3. Search for Italics-all-themes"
 4. Click Install
 
 ## Usage
@@ -24,7 +24,7 @@ Once installed, the extension will automatically apply italics to supported them
 If you need to manually apply the italics settings:
 
 1. Open the Command Palette (Ctrl+Shift+P)
-2. Search for and select "Enable Italics Support"
+2. Search for and select "Enable Italics-all-themes"
 
 ## Supported Elements
 
