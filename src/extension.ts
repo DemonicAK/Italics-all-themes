@@ -1,212 +1,168 @@
-// // The module 'vscode' contains the VS Code extensibility API
-// // Import the module and reference it with the alias vscode in your code below
-// import * as vscode from 'vscode';
-
-// // This method is called when your extension is activated
-// // Your extension is activated the very first time the command is executed
-// export function activate(context: vscode.ExtensionContext) {
-
-// 	// Use the console to output diagnostic information (console.log) and errors (console.error)
-// 	// This line of code will only be executed once when your extension is activated
-// 	console.log('Congratulations, your extension "italics-all-themes" is now active!');
-
-// 	// The command has been defined in the package.json file
-// 	// Now provide the implementation of the command with registerCommand
-// 	// The commandId parameter must match the command field in package.json
-// 	const disposable = vscode.commands.registerCommand('italics-all-themes.helloWorld', () => {
-// 		// The code you place here will be executed every time your command is executed
-// 		// Display a message box to the user
-// 		vscode.window.showInformationMessage('Hello World from italics-all-themes!');
-// 	});
-
-// 	context.subscriptions.push(disposable);
-// }
-
-// // This method is called when your extension is deactivated
-// export function deactivate() {}
-
 import * as vscode from "vscode";
 
+// Italics rules definition
+const italicsRules= [
+  {
+    scope: "emphasis",
+    settings: { fontStyle: "italic" },
+  },
+  {
+    scope: "strong",
+    settings: { fontStyle: "bold" },
+  },
+  {
+    scope: "entity.other.attribute-name",
+    settings: { fontStyle: "italic" },
+  },
+  {
+    scope: "markup.underline",
+    settings: { fontStyle: "underline" },
+  },
+  {
+    scope: "markup.bold",
+    settings: { fontStyle: "bold" },
+  },
+  {
+    scope: "markup.heading",
+    settings: { fontStyle: "italic bold underline" },
+  },
+  {
+    scope: "markup.italic",
+    settings: { fontStyle: "italic" },
+  },
+  {
+    scope: "storage.type",
+    settings: { fontStyle: "italic" },
+  },
+  {
+    scope: "storage.modifier",
+    settings: { fontStyle: "italic" },
+  },
+  {
+    name: "String interpolation",
+    scope: [
+      "punctuation.definition.template-expression.begin",
+      "punctuation.definition.template-expression.end",
+      "punctuation.section.embedded",
+    ],
+    settings: { fontStyle: "italic" },
+  },
+  {
+    scope: "keyword.control",
+    settings: { fontStyle: "italic" },
+  },
+  {
+    scope: [
+      "keyword.operator.new",
+      "keyword.operator.expression",
+      "keyword.operator.cast",
+      "keyword.operator.sizeof",
+      "keyword.operator.logical.python",
+    ],
+    settings: { fontStyle: "italic" },
+  },
+  {
+    name: "this.self",
+    scope: "variable.language",
+    settings: {
+      fontStyle: "italic",
+      foreground: "#ff5874",
+    },
+  },
+  {
+    name: "@Decorator",
+    scope: ["meta.decorator punctuation.decorator"],
+    settings: { fontStyle: "italic" },
+  },
+  {
+    scope: ["punctuation.definition.comment", "comment"],
+    settings: { fontStyle: "italic" },
+  },
+  {
+    scope: ["keywords", "variable", "variable.function", "comment"],
+    settings: { fontStyle: "italic" },
+  },
+  {
+    scope: ["entity.name.function", "meta.function"],
+    settings: { fontStyle: "italic" },
+  },
+];
+let italicsEnabled = true;
+// Activates the extension
 export function activate(context: vscode.ExtensionContext) {
   console.log("Italics Support Extension is now active");
 
-  // Call the function to update settings when the extension is activated
+  // Initialize italics settings on activation
   updateItalicsSettings();
 
-  // Register a command to manually trigger the update
-  let disposable = vscode.commands.registerCommand(
+  // Register command for manual italics update
+  const disposable = vscode.commands.registerCommand(
     "extension.enableItalics",
     () => {
       updateItalicsSettings();
       vscode.window.showInformationMessage(
-        "Italics settings have been updated"
+        "Italics settings have been updated."
       );
     }
   );
 
-  // Listen for theme changes
-  vscode.workspace.onDidChangeConfiguration((event) => {
-    if (event.affectsConfiguration("workbench.colorTheme")) {
-      updateItalicsSettings();
+  // Update settings when theme changes
+  const themeChangeSubscription = vscode.workspace.onDidChangeConfiguration(
+    (event) => {
+      if (event.affectsConfiguration("workbench.colorTheme")) {
+        updateItalicsSettings();
+      }
     }
-  });
+  );
 
-  context.subscriptions.push(disposable);
+  // Push subscriptions to context
+  context.subscriptions.push(disposable, themeChangeSubscription);
+}
+function italicscheck(theme: string): boolean {
+  if (theme.toLowerCase().includes("(no italics)")) {
+    return false;
+  }
+  return true;
 }
 
-function updateItalicsSettings() {
+// Helper function to get the current color theme
+function getCurrentTheme(): string | undefined {
+  try {
+    return vscode.workspace
+      .getConfiguration("workbench")
+      .get("colorTheme") as string;
+  } catch (error) {
+    console.error("Error fetching current theme:", error);
+    return undefined;
+  }
+}
+// Function to update italics settings based on the theme
+function updateItalicsSettings(): void {
   const config = vscode.workspace.getConfiguration();
-  const currentTheme = vscode.workspace
-    .getConfiguration("workbench")
-    .get("colorTheme") as string;
+  const currentTheme = getCurrentTheme();
 
-  // Check if the current theme has "(no italics)" in its name
-  if (currentTheme.toLowerCase().includes("(no italics)")) {
-    console.log("Current theme does not support italics. Skipping...");
-    config.update(
-      "editor.tokenColorCustomizations",
-      {
-        textMateRules: [],
-      },
-      vscode.ConfigurationTarget.Global
-    );
+  if (!currentTheme) {
+    console.error("Unable to retrieve the current theme.");
     return;
   }
+  const italicsReq = italicscheck(currentTheme);
+  if (italicsEnabled === italicsReq) {
+    return;
+  }
+  // Disable italics if theme has "(no italics)" in its name
+  const rules = italicsReq ? [] : italicsRules;
 
-  const italicsRules = [
-    // Your provided rules here
-    {
-      scope: "emphasis",
-      settings: {
-        fontStyle: "italic",
-      },
-    },
-    {
-      scope: "strong",
-      settings: {
-        fontStyle: "bold",
-      },
-    },
-    {
-      scope: "entity.other.attribute-name",
-      settings: {
-        fontStyle: "italic",
-      },
-    },
-    {
-      scope: "markup.underline",
-      settings: {
-        fontStyle: "underline",
-      },
-    },
-    {
-      scope: "markup.bold",
-      settings: {
-        fontStyle: "bold",
-      },
-    },
-    {
-      scope: "markup.heading",
-      settings: {
-        fontStyle: "italic bold underline",
-      },
-    },
-    {
-      scope: "markup.italic",
-      settings: {
-        fontStyle: "italic",
-      },
-    },
-    {
-      scope: "storage.type",
-      settings: {
-        fontStyle: "italic",
-      },
-    },
-    {
-      scope: "storage.modifier",
-      settings: {
-        fontStyle: "italic",
-      },
-    },
-    {
-      name: "String interpolation",
-      scope: [
-        "punctuation.definition.template-expression.begin",
-        "punctuation.definition.template-expression.end",
-        "punctuation.section.embedded",
-      ],
-      settings: {
-        fontStyle: "italic",
-      },
-    },
-    {
-      scope: "keyword.control",
-      settings: {
-        fontStyle: "italic",
-      },
-    },
-    {
-      scope: [
-        "keyword.operator.new",
-        "keyword.operator.expression",
-        "keyword.operator.cast",
-        "keyword.operator.sizeof",
-        "keyword.operator.logical.python",
-      ],
-      settings: {
-        fontStyle: "italic",
-      },
-    },
-    {
-      name: "this.self",
-      scope: "variable.language",
-      settings: {
-        fontStyle: "italic",
-        foreground: "#ff5874",
-      },
-    },
-    {
-      name: "@Decorator",
-      scope: ["meta.decorator punctuation.decorator"],
-      settings: {
-        fontStyle: "italic",
-      },
-    },
-    {
-      scope: ["punctuation.definition.comment", "comment"],
-      settings: {
-        // "foreground": "#ff5874",
-        fontStyle: "italic",
-      },
-    },
-    {
-      scope: ["keywords", "variable", "variable.function", "comment"],
-      settings: {
-        // "foreground": "#ff5874",
-        fontStyle: "italic",
-      },
-    },
-    {
-      // "scope": [],
-      scope: ["entity.name.function", "meta.function"],
-      settings: {
-        // "foreground": "#ff5874",
-        fontStyle: "italic",
-      },
-    },
-
-    // ... (include all the rules from your snippet)
-  ];
-
-  // Update the settings
+  // Update editor settings
   config.update(
     "editor.tokenColorCustomizations",
-    {
-      textMateRules: italicsRules,
-    },
+    { textMateRules: rules },
     vscode.ConfigurationTarget.Global
   );
+   italicsEnabled = italicscheck(currentTheme);
 }
 
-export function deactivate() {}
+
+// Deactivates the extension
+export function deactivate() {
+  console.log("Italics Support Extension is now deactivated.");
+}

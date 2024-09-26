@@ -2,7 +2,7 @@
   "name": "italics-all-themes",
   "displayName": "Italics-all-themes",
   "description": "Enables italics support for all themes except those explicitly marked '(no italics)'",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "publisher": "KarIndustries",
   "author": {
     "name": "Arijit Kar"
@@ -29,7 +29,7 @@
     "syntax highlighting"
   ],
   "activationEvents": [
-    "*"
+    "onStartupFinished"
   ],
   "main": "./dist/extension.js",
   "contributes": {
