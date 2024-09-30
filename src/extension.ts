@@ -1,109 +1,75 @@
-import * as vscode from "vscode";
-import { italicsRules } from "./italicsRules";
+import * as vscode from 'vscode';
 
-let disposables: vscode.Disposable[] = [];
+let decorationType: vscode.TextEditorDecorationType | undefined;
 
 export function activate(context: vscode.ExtensionContext) {
-  console.log("Italics Support Extension is now active");
+  console.log('Italics Support Extension is now active');
 
-  // Initialize italics settings on activation
-  updateItalicsSettings();
+  // Apply italics dynamically on activation
+  updateItalicsForActiveEditors();
 
-  // Register command for manual italics update
-  const disposable = vscode.commands.registerCommand(
-    "extension.updateItalics",
-    () => {
-      updateItalicsSettings();
-      vscode.window.showInformationMessage(
-        "Italics settings have been updated."
-      );
+  // Listen for theme changes
+  const themeChangeSubscription = vscode.workspace.onDidChangeConfiguration((event) => {
+    if (event.affectsConfiguration('workbench.colorTheme')) {
+      updateItalicsForActiveEditors();
     }
-  );
+  });
 
-  // Update settings when theme changes
-  const themeChangeSubscription = vscode.workspace.onDidChangeConfiguration(
-    (event) => {
-      if (event.affectsConfiguration("workbench.colorTheme")) {
-        updateItalicsSettings();
-      }
-    }
-  );
+  // Apply italics to newly opened editors
+  const editorOpenSubscription = vscode.window.onDidChangeActiveTextEditor(() => {
+    updateItalicsForActiveEditors();
+  });
 
-  // Push subscriptions to context
-  context.subscriptions.push(disposable, themeChangeSubscription);
+  context.subscriptions.push(themeChangeSubscription, editorOpenSubscription);
 }
 
 function shouldApplyItalics(theme: string): boolean {
-  return !theme.toLowerCase().includes("(no italics)");
+  return !theme.toLowerCase().includes('(no italics)');
 }
 
 function getCurrentTheme(): string | undefined {
   try {
-    return vscode.workspace
-      .getConfiguration("workbench")
-      .get("colorTheme") as string;
+    return vscode.workspace.getConfiguration('workbench').get('colorTheme') as string;
   } catch (error) {
-    console.error("Error fetching current theme:", error);
+    console.error('Error fetching current theme:', error);
     return undefined;
   }
 }
 
-function updateItalicsSettings(): void {
-  const config = vscode.workspace.getConfiguration();
+function updateItalicsForActiveEditors(): void {
   const currentTheme = getCurrentTheme();
-
+  
   if (!currentTheme) {
-    console.error("Unable to retrieve the current theme.");
+    console.error('Unable to retrieve the current theme.');
     return;
+  }
+
+  // Dispose of existing decoration if it exists
+  if (decorationType) {
+    decorationType.dispose();
   }
 
   const applyItalics = shouldApplyItalics(currentTheme);
 
-  // Apply italics rules if the theme doesn't include "(no italics)"
-  const rules = applyItalics ? italicsRules : [];
+  if (applyItalics) {
+    decorationType = vscode.window.createTextEditorDecorationType({
+      fontStyle: 'italic',
+    });
 
-  // Update editor settings
-  config.update(
-    "editor.tokenColorCustomizations",
-    { textMateRules: rules },
-    vscode.ConfigurationTarget.Global
-  );
-
-  console.log(
-    `Italics ${
-      applyItalics ? "applied" : "not applied"
-    } for theme: ${currentTheme}`
-  );
+    const activeEditor = vscode.window.activeTextEditor;
+    if (activeEditor) {
+      // Apply decorations to the entire document
+      const range = new vscode.Range(0, 0, activeEditor.document.lineCount, 0);
+      activeEditor.setDecorations(decorationType, [range]);
+    }
+  } else {
+    console.log('Italics not applied for theme:', currentTheme);
+  }
 }
 
 export function deactivate() {
-  // Remove italics settings
-  const config = vscode.workspace.getConfiguration();
-  config
-    .update(
-      "editor.tokenColorCustomizations",
-      { textMateRules: [] },
-      vscode.ConfigurationTarget.Global
-    )
-    .then(
-      () => {
-        console.log("Italics settings have been removed.");
-      },
-      (error) => {
-        console.error("Error removing italics settings:", error);
-      }
-    );
-
-  // Dispose of all disposables
-  disposables.forEach((disposable) => {
-    try {
-      disposable.dispose();
-    } catch (error) {
-      console.error("Error disposing of disposable:", error);
-    }
-  });
-
-  // Clear the disposables array
-  disposables = [];
-  console.log("Italics Support Extension is now deactivated.");
+  // Clean up the decoration type if it exists
+  if (decorationType) {
+    decorationType.dispose();
+  }
 }
