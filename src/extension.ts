@@ -1,6 +1,8 @@
 import * as vscode from "vscode";
 import { italicsRules } from "./italicsRules";
 
+let disposables: vscode.Disposable[] = [];
+
 export function activate(context: vscode.ExtensionContext) {
   console.log("Italics Support Extension is now active");
 
@@ -75,5 +77,33 @@ function updateItalicsSettings(): void {
 }
 
 export function deactivate() {
+  // Remove italics settings
+  const config = vscode.workspace.getConfiguration();
+  config
+    .update(
+      "editor.tokenColorCustomizations",
+      { textMateRules: [] },
+      vscode.ConfigurationTarget.Global
+    )
+    .then(
+      () => {
+        console.log("Italics settings have been removed.");
+      },
+      (error) => {
+        console.error("Error removing italics settings:", error);
+      }
+    );
+
+  // Dispose of all disposables
+  disposables.forEach((disposable) => {
+    try {
+      disposable.dispose();
+    } catch (error) {
+      console.error("Error disposing of disposable:", error);
+    }
+  });
+
+  // Clear the disposables array
+  disposables = [];
   console.log("Italics Support Extension is now deactivated.");
 }
