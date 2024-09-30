@@ -2,7 +2,8 @@
   "name": "italics-all-themes",
   "displayName": "Italics-all-themes",
   "description": "Enables italics support for all themes except those explicitly marked (no italics)",
-  "version": "1.2.1",
+  "icon": "logo.png",
+  "version": "1.2.2",
   "publisher": "KarIndustries",
   "author": {
     "name": "Arijit Kar"
